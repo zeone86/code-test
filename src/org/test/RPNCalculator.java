@@ -11,15 +11,15 @@ import java.util.*;
  */
 public class RPNCalculator {
     private Stack<Object> stack = new Stack<>();
-    private static Set<String> operWord = new HashSet<>();
-    private ArrayList<Integer> opMark = new ArrayList<>();
+    private static Set<String> operatorToken = new HashSet<>();
+    private Map<Integer, Integer> opMark = new HashMap<>();
 
     static {
-        operWord.add("+");
-        operWord.add("-");
-        operWord.add("*");
-        operWord.add("/");
-        operWord.add("sqrt");
+        operatorToken.add("+");
+        operatorToken.add("-");
+        operatorToken.add("*");
+        operatorToken.add("/");
+        operatorToken.add("sqrt");
     }
 
     RPNCalculator() {
@@ -35,11 +35,11 @@ public class RPNCalculator {
             boolean isValid = true;
             if (num != null) {
                 stack.push(num);
-            } else if (operWord.contains(curParam)) {
-                opMark.add(stack.size());
+            } else if (operatorToken.contains(curParam)) {
+                opMark.put(stack.size(), i);
                 stack.push(curParam);
             } else if (curParam.equals("undo")) {
-                if (opMark.contains(stack.size())) {
+                if (opMark.containsKey(stack.size())) {
                     opMark.remove(stack.size());
                 }
                 if (stack.size() > 0)
@@ -67,10 +67,11 @@ public class RPNCalculator {
             int stackSize = stack.size();
             try {
                 for (; i < stackSize; i++) {
-                    if (!opMark.contains(i)) {
+                    if (!opMark.containsKey(i)) {
                         curStack.push(stack.get(i));
                     } else {
                         op = (String) stack.get(i);
+
                         BigDecimal result;
                         if (op.equals("sqrt")) {
                             BigDecimal param = (BigDecimal) curStack.pop();
@@ -95,8 +96,8 @@ public class RPNCalculator {
                 if (second != null)
                     curStack.push(second);
                 stack = curStack;
+                showWarn(op, opMark.get(i) + 1);
                 opMark.clear();
-                showWarn(op, i * 2 + 1);
                 showStack();
             }
         }
